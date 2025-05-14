@@ -56,10 +56,10 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
       closeDate: selectedDate,
       symbol: '',
       type: 'buy' as const,
-      entryPrice: undefined,
-      exitPrice: undefined,
-      quantity: undefined,
-      profit: undefined,
+      entryPrice: 0,
+      exitPrice: 0,
+      quantity: 0,
+      profit: 0,
       notes: '',
     },
   });
@@ -68,7 +68,19 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
     if (editingTrade) {
       updateTrade(editingTrade.id, data);
     } else {
-      addTrade(data);
+      // Make sure we're passing a complete trade object with all required fields
+      addTrade({
+        date: data.date,
+        openDate: data.openDate,
+        closeDate: data.closeDate,
+        symbol: data.symbol,
+        type: data.type,
+        entryPrice: data.entryPrice,
+        exitPrice: data.exitPrice,
+        quantity: data.quantity,
+        profit: data.profit,
+        notes: data.notes || '',
+      });
     }
     onSuccess();
   };
