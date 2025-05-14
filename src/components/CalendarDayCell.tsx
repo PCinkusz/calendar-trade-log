@@ -38,8 +38,18 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
   
   const hasNotes = dayTrades.some(trade => trade.notes && trade.notes.trim() !== '');
   
-  // Get unique symbols for the day
-  const symbols = [...new Set(dayTrades.map(trade => trade.symbol))];
+  // Get the most important trade (biggest win or loss)
+  const getMostImportantSymbol = () => {
+    if (tradeCount === 0) return null;
+    
+    const sortedTrades = [...dayTrades].sort((a, b) => 
+      Math.abs(b.profit) - Math.abs(a.profit)
+    );
+    
+    return sortedTrades[0].symbol;
+  };
+  
+  const mostImportantSymbol = getMostImportantSymbol();
   
   return (
     <>
@@ -58,22 +68,22 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         tabIndex={0}
         aria-label={`Select ${format(date, 'MMMM d, yyyy')}`}
       >
-        <div className="flex justify-between items-start p-1">
+        <div className="flex justify-between items-start p-2">
           <div className="relative z-10">
             {hasNotes && (
-              <FileText className="h-4 w-4 text-primary opacity-70" />
+              <FileText className="h-4 w-4 text-foreground opacity-70" />
             )}
           </div>
-          <div className="text-sm font-medium p-1">
+          <div className="text-sm font-medium">
             {format(date, 'd')}
           </div>
         </div>
         
-        {/* Add trade button that slides down on hover */}
+        {/* Add trade button that slides down on hover - positioned higher */}
         <div 
           className={cn(
-            "absolute inset-x-0 top-0 flex justify-center transition-transform duration-300 z-20",
-            isHovered ? "translate-y-0" : "-translate-y-full"
+            "absolute inset-x-0 -top-6 flex justify-center transition-transform duration-300 z-20",
+            isHovered ? "translate-y-6" : "translate-y-0"
           )}
         >
           <Button 
@@ -98,32 +108,31 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
                 {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
               </span>
               <span className={cn(
-                "font-semibold text-lg",
+                "font-semibold text-xl", // Increased font size
                 isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
               )}>
                 {formatCurrency(totalProfit)}
               </span>
             </div>
             
-            <div className="text-xs">
-              Win rate: <span className={winRate > 50 ? "profit-text" : "loss-text"}>{winRate}%</span>
+            {/* Win rate percentage with cyan color */}
+            <div className="text-sm text-[#33C3F0] font-medium">
+              {winRate}%
             </div>
             
-            {symbols.length > 0 && (
+            {/* Show only the most important symbol */}
+            {mostImportantSymbol && (
               <div className="flex flex-wrap gap-1 mt-1">
-                {symbols.map(symbol => (
-                  <div 
-                    key={symbol} 
-                    className={cn(
-                      "text-xs px-1.5 py-0.5 rounded-full",
-                      isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
-                      isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
-                      "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    {symbol}
-                  </div>
-                ))}
+                <div 
+                  className={cn(
+                    "text-xs px-1.5 py-0.5 rounded-full",
+                    isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
+                    isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
+                    "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {mostImportantSymbol}
+                </div>
               </div>
             )}
           </div>
