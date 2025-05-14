@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { TradeForm } from './TradeForm';
-import { Note, Plus } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import { Button } from './ui/button';
 
 type CalendarDayCellProps = {
@@ -61,7 +61,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         <div className="flex justify-between items-start p-1">
           <div className="relative z-10">
             {hasNotes && (
-              <Note className="h-4 w-4 text-primary opacity-70" />
+              <FileText className="h-4 w-4 text-primary opacity-70" />
             )}
           </div>
           <div className="text-sm font-medium p-1">
