@@ -3,7 +3,7 @@ import React from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useTradeStore } from '@/store/tradeStore';
-import { ArrowLeft, ArrowRight, CalendarPlus } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CalendarDayCell } from './CalendarDayCell';
 
@@ -65,16 +65,6 @@ export const CalendarView = () => {
             className="ml-2 rounded-lg shadow-sm hover:shadow-md transition-all"
           >
             Today
-          </Button>
-        </div>
-        
-        <div>
-          <Button 
-            variant="default" 
-            className="bg-primary text-primary-foreground rounded-lg shadow-sm hover:shadow-md transition-all flex gap-2 items-center"
-          >
-            <CalendarPlus className="h-4 w-4" />
-            <span>Choose View</span>
           </Button>
         </div>
       </div>

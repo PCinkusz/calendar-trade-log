@@ -19,6 +19,8 @@ export const TradeList = () => {
   
   const trades = getTradesByDate(selectedDate);
   const totalProfit = trades.reduce((sum, trade) => sum + trade.profit, 0);
+  const winningTrades = trades.filter(trade => trade.profit > 0).length;
+  const winRate = trades.length > 0 ? Math.round((winningTrades / trades.length) * 100) : 0;
   
   const handleEditTrade = (trade: Trade) => {
     setEditingTrade(trade);
@@ -40,7 +42,7 @@ export const TradeList = () => {
           <DialogTrigger asChild>
             <Button 
               size="lg" 
-              className="bg-primary shadow-lg hover:shadow-xl transition-all rounded-xl flex gap-2 items-center"
+              className="bg-primary shadow-lg hover:shadow-xl transition-all rounded-xl flex gap-2 items-center px-6 py-5 text-base"
             >
               <Plus className="w-5 h-5" />
               <span>Add Trade</span>
@@ -67,11 +69,23 @@ export const TradeList = () => {
       ) : (
         <div className="space-y-3">
           <Card className="p-4 shadow-md rounded-xl border-2">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Total Profit/Loss:</span>
-              <span className={totalProfit > 0 ? "profit-text font-bold" : totalProfit < 0 ? "loss-text font-bold" : ""}>
-                {formatCurrency(totalProfit)}
-              </span>
+            <div className="flex flex-wrap gap-4 justify-between items-center">
+              <div>
+                <span className="font-medium">Total Profit/Loss:</span>
+                <span className={`ml-2 ${totalProfit > 0 ? "profit-text font-bold" : totalProfit < 0 ? "loss-text font-bold" : ""}`}>
+                  {formatCurrency(totalProfit)}
+                </span>
+              </div>
+              
+              <div>
+                <span className="font-medium">Win Rate:</span>
+                <span className={`ml-2 ${winRate > 50 ? "profit-text font-bold" : "loss-text font-bold"}`}>
+                  {winRate}%
+                </span>
+                <span className="text-sm text-muted-foreground ml-2">
+                  ({winningTrades}/{trades.length})
+                </span>
+              </div>
             </div>
           </Card>
           
@@ -126,7 +140,7 @@ export const TradeList = () => {
                       <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete this trade
                         record from your journal.
-                      </AlertDialogDescription>
+                      </DialogDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>

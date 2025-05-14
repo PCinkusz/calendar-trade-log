@@ -61,7 +61,8 @@ export const useTradeStore = create<TradeState>()(
         const { trades } = get();
         const dateStr = format(date, 'yyyy-MM-dd');
         
-        return trades.filter(trade => format(new Date(trade.date), 'yyyy-MM-dd') === dateStr);
+        // Use the closeDate field instead of date field for filtering
+        return trades.filter(trade => format(new Date(trade.closeDate), 'yyyy-MM-dd') === dateStr);
       },
       
       getTradesByDateRange: (start, end) => {
@@ -69,8 +70,9 @@ export const useTradeStore = create<TradeState>()(
         const startTime = start.getTime();
         const endTime = end.getTime();
         
+        // Use the closeDate field for filtering date range
         return trades.filter(trade => {
-          const tradeTime = new Date(trade.date).getTime();
+          const tradeTime = new Date(trade.closeDate).getTime();
           return tradeTime >= startTime && tradeTime <= endTime;
         });
       },
@@ -100,7 +102,7 @@ export const useTradeStore = create<TradeState>()(
         // Group trades by week
         const monthlyTrades = getTradesByDateRange(startDate, endDate);
         monthlyTrades.forEach(trade => {
-          const tradeDate = new Date(trade.date);
+          const tradeDate = new Date(trade.closeDate);
           const weekNum = getWeek(tradeDate);
           
           if (weeklyData[weekNum]) {

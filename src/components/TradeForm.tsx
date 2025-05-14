@@ -17,9 +17,6 @@ import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, Clock } from 'lucide-react';
 
 const TradeFormSchema = z.object({
-  date: z.date({
-    required_error: 'Trade date is required',
-  }),
   openDate: z.date({
     required_error: 'Open date is required',
   }),
@@ -47,11 +44,9 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
     resolver: zodResolver(TradeFormSchema),
     defaultValues: editingTrade ? {
       ...editingTrade,
-      date: new Date(editingTrade.date),
       openDate: new Date(editingTrade.openDate),
       closeDate: new Date(editingTrade.closeDate),
     } : {
-      date: selectedDate,
       openDate: selectedDate,
       closeDate: selectedDate,
       symbol: '',
@@ -68,9 +63,9 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
     if (editingTrade) {
       updateTrade(editingTrade.id, data);
     } else {
-      // Make sure we're passing a complete trade object with all required fields
+      // We use closeDate as the primary date for the trade 
       addTrade({
-        date: data.date,
+        date: data.closeDate,
         openDate: data.openDate,
         closeDate: data.closeDate,
         symbol: data.symbol,
@@ -88,46 +83,6 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Trade Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal rounded-xl shadow-sm border-2",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, 'PPP')
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 rounded-xl shadow-md" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    initialFocus
-                    className={cn("p-3 pointer-events-auto")}
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -305,7 +260,13 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
               <FormItem>
                 <FormLabel>Entry Price</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" className="rounded-xl shadow-sm border-2" {...field} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    placeholder="0.00" 
+                    className="rounded-xl shadow-sm border-2" 
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -319,7 +280,13 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
               <FormItem>
                 <FormLabel>Exit Price</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" className="rounded-xl shadow-sm border-2" {...field} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    placeholder="0.00"
+                    className="rounded-xl shadow-sm border-2" 
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -333,9 +300,14 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
             name="quantity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Quantity</FormLabel>
+                <FormLabel>Volume</FormLabel>
                 <FormControl>
-                  <Input type="number" className="rounded-xl shadow-sm border-2" {...field} />
+                  <Input 
+                    type="number" 
+                    placeholder="0"
+                    className="rounded-xl shadow-sm border-2" 
+                    {...field} 
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -352,6 +324,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
                   <Input 
                     type="number" 
                     step="0.01" 
+                    placeholder="0.00"
                     className={cn(
                       "rounded-xl shadow-sm border-2",
                       parseFloat(field.value as any) > 0 ? "text-[hsl(var(--profit))]" : 
