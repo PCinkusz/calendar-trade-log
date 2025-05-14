@@ -140,7 +140,7 @@ export const TradeList = () => {
                       <AlertDialogDescription>
                         This action cannot be undone. This will permanently delete this trade
                         record from your journal.
-                      </DialogDialogDescription>
+                      </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>
