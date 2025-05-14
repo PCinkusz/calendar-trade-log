@@ -3,7 +3,7 @@ import React from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useTradeStore } from '@/store/tradeStore';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CalendarDayCell } from './CalendarDayCell';
 
@@ -32,7 +32,7 @@ export const CalendarView = () => {
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   return (
-    <div className="w-full bg-card rounded-md shadow-sm">
+    <div className="w-full bg-card rounded-xl shadow-md border-2">
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center space-x-2">
           <Button 
@@ -40,6 +40,7 @@ export const CalendarView = () => {
             size="icon" 
             onClick={prevMonth}
             aria-label="Previous month"
+            className="rounded-lg shadow-sm hover:shadow-md transition-all"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -53,6 +54,7 @@ export const CalendarView = () => {
             size="icon" 
             onClick={nextMonth}
             aria-label="Next month"
+            className="rounded-lg shadow-sm hover:shadow-md transition-all"
           >
             <ArrowRight className="h-4 w-4" />
           </Button>
@@ -60,15 +62,19 @@ export const CalendarView = () => {
           <Button 
             variant="outline"
             onClick={goToToday}
-            className="ml-2"
+            className="ml-2 rounded-lg shadow-sm hover:shadow-md transition-all"
           >
             Today
           </Button>
         </div>
         
         <div>
-          <Button variant="outline" className="bg-primary text-primary-foreground">
-            Choose your dashboard view
+          <Button 
+            variant="default" 
+            className="bg-primary text-primary-foreground rounded-lg shadow-sm hover:shadow-md transition-all flex gap-2 items-center"
+          >
+            <CalendarPlus className="h-4 w-4" />
+            <span>Choose View</span>
           </Button>
         </div>
       </div>
@@ -81,7 +87,7 @@ export const CalendarView = () => {
         ))}
       </div>
       
-      <div className="grid grid-cols-7 gap-px">
+      <div className="grid grid-cols-7 gap-2 p-2">
         {monthDays.map(day => (
           <CalendarDayCell 
             key={day.toString()} 

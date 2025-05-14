@@ -7,8 +7,8 @@ import { SummarySidebar } from '@/components/SummarySidebar';
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b py-4 px-6">
-        <h1 className="text-2xl font-bold">Trading Journal</h1>
+      <header className="border-b py-4 px-6 shadow-sm bg-card">
+        <h1 className="text-2xl font-bold text-primary">Trading Journal</h1>
       </header>
       
       <main className="container mx-auto py-6 px-4">

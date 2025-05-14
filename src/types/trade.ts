@@ -2,6 +2,8 @@
 export type Trade = {
   id: string;
   date: Date;
+  openDate: Date;
+  closeDate: Date;
   symbol: string;
   type: 'buy' | 'sell';
   entryPrice: number;

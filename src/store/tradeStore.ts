@@ -27,7 +27,8 @@ export const useTradeStore = create<TradeState>()(
         const newTrade: Trade = {
           ...trade,
           id: crypto.randomUUID(),
-          profit: (trade.exitPrice - trade.entryPrice) * trade.quantity * (trade.type === 'buy' ? 1 : -1),
+          // Use the manually entered profit value directly
+          profit: trade.profit !== undefined ? trade.profit : 0,
         };
         return { trades: [...state.trades, newTrade] };
       }),
@@ -39,14 +40,9 @@ export const useTradeStore = create<TradeState>()(
         const oldTrade = state.trades[tradeIndex];
         const newTrade = { ...oldTrade, ...updatedTrade };
         
-        // Recalculate profit if relevant fields were updated
-        if (updatedTrade.entryPrice !== undefined || 
-            updatedTrade.exitPrice !== undefined || 
-            updatedTrade.quantity !== undefined ||
-            updatedTrade.type !== undefined) {
-          newTrade.profit = (newTrade.exitPrice - newTrade.entryPrice) * 
-                            newTrade.quantity * 
-                            (newTrade.type === 'buy' ? 1 : -1);
+        // If profit was manually updated, use that value directly
+        if (updatedTrade.profit !== undefined) {
+          newTrade.profit = updatedTrade.profit;
         }
         
         const updatedTrades = [...state.trades];

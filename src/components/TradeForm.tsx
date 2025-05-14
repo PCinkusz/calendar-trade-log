@@ -14,17 +14,24 @@ import { Trade } from '@/types/trade';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Clock } from 'lucide-react';
 
 const TradeFormSchema = z.object({
   date: z.date({
     required_error: 'Trade date is required',
+  }),
+  openDate: z.date({
+    required_error: 'Open date is required',
+  }),
+  closeDate: z.date({
+    required_error: 'Close date is required',
   }),
   symbol: z.string().min(1, 'Symbol is required'),
   type: z.enum(['buy', 'sell']),
   entryPrice: z.coerce.number().positive('Entry price must be positive'),
   exitPrice: z.coerce.number().positive('Exit price must be positive'),
   quantity: z.coerce.number().positive('Quantity must be positive'),
+  profit: z.coerce.number(),
   notes: z.string().optional(),
 });
 
@@ -41,13 +48,18 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
     defaultValues: editingTrade ? {
       ...editingTrade,
       date: new Date(editingTrade.date),
+      openDate: new Date(editingTrade.openDate),
+      closeDate: new Date(editingTrade.closeDate),
     } : {
       date: selectedDate,
+      openDate: selectedDate,
+      closeDate: selectedDate,
       symbol: '',
       type: 'buy' as const,
       entryPrice: undefined,
       exitPrice: undefined,
       quantity: undefined,
+      profit: undefined,
       notes: '',
     },
   });
@@ -69,14 +81,14 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Date</FormLabel>
+              <FormLabel>Trade Date</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full pl-3 text-left font-normal",
+                        "w-full pl-3 text-left font-normal rounded-xl shadow-sm border-2",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -89,7 +101,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 rounded-xl shadow-md" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -104,6 +116,136 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           )}
         />
         
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="openDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Open Date & Time</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal rounded-xl shadow-sm border-2",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, 'PPP p')
+                        ) : (
+                          <span>Pick open date/time</span>
+                        )}
+                        <Clock className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 rounded-xl shadow-md" align="start">
+                    <div className="p-3">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                          if (date) {
+                            const newDate = new Date(date);
+                            const currentValue = field.value || new Date();
+                            newDate.setHours(currentValue.getHours());
+                            newDate.setMinutes(currentValue.getMinutes());
+                            field.onChange(newDate);
+                          }
+                        }}
+                        initialFocus
+                        className={cn("pb-3 pointer-events-auto")}
+                      />
+                      <div className="flex items-center gap-2 pt-3 border-t">
+                        <Input
+                          type="time"
+                          className="rounded-xl"
+                          value={field.value ? format(field.value, 'HH:mm') : ''}
+                          onChange={(e) => {
+                            const [hours, minutes] = e.target.value.split(':').map(Number);
+                            const newDate = new Date(field.value || new Date());
+                            newDate.setHours(hours || 0);
+                            newDate.setMinutes(minutes || 0);
+                            field.onChange(newDate);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="closeDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Close Date & Time</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal rounded-xl shadow-sm border-2",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, 'PPP p')
+                        ) : (
+                          <span>Pick close date/time</span>
+                        )}
+                        <Clock className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 rounded-xl shadow-md" align="start">
+                    <div className="p-3">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                          if (date) {
+                            const newDate = new Date(date);
+                            const currentValue = field.value || new Date();
+                            newDate.setHours(currentValue.getHours());
+                            newDate.setMinutes(currentValue.getMinutes());
+                            field.onChange(newDate);
+                          }
+                        }}
+                        initialFocus
+                        className={cn("pb-3 pointer-events-auto")}
+                      />
+                      <div className="flex items-center gap-2 pt-3 border-t">
+                        <Input
+                          type="time"
+                          className="rounded-xl"
+                          value={field.value ? format(field.value, 'HH:mm') : ''}
+                          onChange={(e) => {
+                            const [hours, minutes] = e.target.value.split(':').map(Number);
+                            const newDate = new Date(field.value || new Date());
+                            newDate.setHours(hours || 0);
+                            newDate.setMinutes(minutes || 0);
+                            field.onChange(newDate);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        
         <FormField
           control={form.control}
           name="symbol"
@@ -111,7 +253,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
             <FormItem>
               <FormLabel>Symbol</FormLabel>
               <FormControl>
-                <Input placeholder="AAPL" {...field} />
+                <Input placeholder="AAPL" className="rounded-xl shadow-sm border-2" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -129,11 +271,11 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
                 defaultValue={field.value}
               >
                 <FormControl>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl shadow-sm border-2">
                     <SelectValue placeholder="Select trade type" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="rounded-xl shadow-md">
                   <SelectItem value="buy">Buy</SelectItem>
                   <SelectItem value="sell">Sell</SelectItem>
                 </SelectContent>
@@ -151,7 +293,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
               <FormItem>
                 <FormLabel>Entry Price</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} />
+                  <Input type="number" step="0.01" className="rounded-xl shadow-sm border-2" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -165,7 +307,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
               <FormItem>
                 <FormLabel>Exit Price</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} />
+                  <Input type="number" step="0.01" className="rounded-xl shadow-sm border-2" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -173,19 +315,44 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           />
         </div>
         
-        <FormField
-          control={form.control}
-          name="quantity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Quantity</FormLabel>
-              <FormControl>
-                <Input type="number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="quantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Quantity</FormLabel>
+                <FormControl>
+                  <Input type="number" className="rounded-xl shadow-sm border-2" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="profit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Profit/Loss</FormLabel>
+                <FormControl>
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    className={cn(
+                      "rounded-xl shadow-sm border-2",
+                      parseFloat(field.value as any) > 0 ? "text-[hsl(var(--profit))]" : 
+                      parseFloat(field.value as any) < 0 ? "text-[hsl(var(--loss))]" : ""
+                    )}
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         
         <FormField
           control={form.control}
@@ -196,7 +363,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
               <FormControl>
                 <Textarea 
                   placeholder="Add your trade notes here..." 
-                  className="resize-none" 
+                  className="resize-none rounded-xl shadow-sm border-2" 
                   {...field} 
                 />
               </FormControl>
@@ -205,7 +372,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           )}
         />
         
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full rounded-xl shadow-md hover:shadow-lg transition-all">
           {editingTrade ? 'Update Trade' : 'Add Trade'}
         </Button>
       </form>

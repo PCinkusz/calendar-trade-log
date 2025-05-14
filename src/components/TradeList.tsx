@@ -9,6 +9,7 @@ import { useTradeStore } from '@/store/tradeStore';
 import { TradeForm } from './TradeForm';
 import { formatCurrency } from '@/lib/formatters';
 import { Trade } from '@/types/trade';
+import { Plus } from 'lucide-react';
 
 export const TradeList = () => {
   const { selectedDate, getTradesByDate, deleteTrade } = useTradeStore();
@@ -37,9 +38,15 @@ export const TradeList = () => {
         </h2>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline">Add Trade</Button>
+            <Button 
+              size="lg" 
+              className="bg-primary shadow-lg hover:shadow-xl transition-all rounded-xl flex gap-2 items-center"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Add Trade</span>
+            </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] rounded-xl shadow-xl border-2">
             <DialogHeader>
               <DialogTitle>Add New Trade</DialogTitle>
               <DialogDescription>
@@ -54,12 +61,12 @@ export const TradeList = () => {
       </div>
       
       {trades.length === 0 ? (
-        <Card className="p-6 text-center text-gray-500">
+        <Card className="p-6 text-center text-gray-500 shadow-md rounded-xl border-2">
           No trades recorded for this date.
         </Card>
       ) : (
         <div className="space-y-3">
-          <Card className="p-4">
+          <Card className="p-4 shadow-md rounded-xl border-2">
             <div className="flex justify-between items-center">
               <span className="font-medium">Total Profit/Loss:</span>
               <span className={totalProfit > 0 ? "profit-text font-bold" : totalProfit < 0 ? "loss-text font-bold" : ""}>
@@ -69,12 +76,18 @@ export const TradeList = () => {
           </Card>
           
           {trades.map((trade) => (
-            <Card key={trade.id} className="p-4">
+            <Card key={trade.id} className="p-4 shadow-md hover:shadow-lg transition-all rounded-xl border-2">
               <div className="flex justify-between">
                 <div>
                   <h3 className="font-medium">{trade.symbol}</h3>
                   <div className="text-sm text-muted-foreground">
                     {trade.type.toUpperCase()} - {trade.quantity} shares
+                  </div>
+                  <div className="text-sm">
+                    Open: {format(new Date(trade.openDate), 'MMM d, p')}
+                  </div>
+                  <div className="text-sm">
+                    Close: {format(new Date(trade.closeDate), 'MMM d, p')}
                   </div>
                 </div>
                 <div className="text-right">
@@ -97,6 +110,7 @@ export const TradeList = () => {
                 <Button
                   variant="outline"
                   size="sm"
+                  className="rounded-lg"
                   onClick={() => handleEditTrade(trade)}
                 >
                   Edit
@@ -104,9 +118,9 @@ export const TradeList = () => {
                 
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">Delete</Button>
+                    <Button variant="destructive" size="sm" className="rounded-lg">Delete</Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="rounded-xl shadow-xl border-2">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -115,8 +129,11 @@ export const TradeList = () => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => deleteTrade(trade.id)}>
+                      <AlertDialogCancel className="rounded-lg">Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        className="rounded-lg" 
+                        onClick={() => deleteTrade(trade.id)}
+                      >
                         Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>
@@ -129,7 +146,7 @@ export const TradeList = () => {
       )}
       
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px] rounded-xl shadow-xl border-2">
           <DialogHeader>
             <DialogTitle>Edit Trade</DialogTitle>
             <DialogDescription>
