@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { useTradeStore } from '@/store/tradeStore';
@@ -40,7 +39,6 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
   
   const hasNotes = dayTrades.some(trade => trade.notes && trade.notes.trim() !== '');
   
-  // Get the most important trade (biggest win or loss)
   const getMostImportantSymbol = () => {
     if (tradeCount === 0) return null;
     
@@ -60,7 +58,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
           <div 
             className={cn(
               "calendar-day rounded-xl hover:shadow-md hover:scale-105 transition-all cursor-pointer relative overflow-hidden",
-              isSelected ? "ring-2 ring-primary ring-inset" : "",
+              isSelected ? "ring-1 ring-primary/30" : "",
               !isCurrentMonth ? "opacity-40" : "",
               tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
               tradeCount > 0 && isUnprofitableDay ? "trade-day-loss" : ""
@@ -83,7 +81,6 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
               </div>
             </div>
             
-            {/* Add trade button that slides down on hover - positioned higher */}
             <div 
               className={cn(
                 "absolute inset-x-0 -top-8 flex justify-center transition-transform duration-300 z-20",
@@ -119,12 +116,10 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
                   </span>
                 </div>
                 
-                {/* Win rate percentage with cyan color */}
-                <div className="text-sm text-[#33C3F0] font-medium">
+                <div className="text-sm text-primary font-medium">
                   {winRate}%
                 </div>
                 
-                {/* Show only the most important symbol */}
                 {mostImportantSymbol && (
                   <div className="flex flex-wrap gap-1">
                     <div 
@@ -143,7 +138,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
             )}
           </div>
         </PopoverTrigger>
-        <PopoverContent className="w-80" align="center">
+        <PopoverContent className="w-[500px] p-0" align="center">
           <TradeViewPopover date={date} onAddClick={() => setIsAddTradeOpen(true)} />
         </PopoverContent>
       </Popover>
