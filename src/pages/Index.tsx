@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { CalendarView } from '@/components/CalendarView';
-import { TradeList } from '@/components/TradeList';
 import { SummarySidebar } from '@/components/SummarySidebar';
 
 const Index = () => {
@@ -15,7 +14,6 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <CalendarView />
-            <TradeList />
           </div>
           <div className="lg:col-span-1">
             <SummarySidebar />

@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { TradeForm } from './TradeForm';
 import { FileText, Plus } from 'lucide-react';
 import { Button } from './ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { TradeViewPopover } from './TradeViewPopover';
 
 type CalendarDayCellProps = {
   date: Date;
@@ -53,91 +55,98 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
   
   return (
     <>
-      <div 
-        className={cn(
-          "calendar-day rounded-xl hover:shadow-md transition-all cursor-pointer relative overflow-hidden",
-          isSelected ? "ring-2 ring-primary ring-inset" : "",
-          !isCurrentMonth ? "opacity-40" : "",
-          tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
-          tradeCount > 0 && isUnprofitableDay ? "trade-day-loss" : ""
-        )}
-        onClick={onSelectDate}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        role="button"
-        tabIndex={0}
-        aria-label={`Select ${format(date, 'MMMM d, yyyy')}`}
-      >
-        <div className="flex justify-between items-start p-2">
-          <div className="relative z-10">
-            {hasNotes && (
-              <FileText className="h-4 w-4 text-foreground opacity-70" />
+      <Popover>
+        <PopoverTrigger asChild>
+          <div 
+            className={cn(
+              "calendar-day rounded-xl hover:shadow-md hover:scale-105 transition-all cursor-pointer relative overflow-hidden",
+              isSelected ? "ring-2 ring-primary ring-inset" : "",
+              !isCurrentMonth ? "opacity-40" : "",
+              tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
+              tradeCount > 0 && isUnprofitableDay ? "trade-day-loss" : ""
             )}
-          </div>
-          <div className="text-sm font-medium">
-            {format(date, 'd')}
-          </div>
-        </div>
-        
-        {/* Add trade button that slides down on hover - positioned higher */}
-        <div 
-          className={cn(
-            "absolute inset-x-0 -top-6 flex justify-center transition-transform duration-300 z-20",
-            isHovered ? "translate-y-6" : "translate-y-0"
-          )}
-        >
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm rounded-full shadow-md"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelectDate();
-              setIsAddTradeOpen(true);
-            }}
+            onClick={onSelectDate}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            role="button"
+            tabIndex={0}
+            aria-label={`Select ${format(date, 'MMMM d, yyyy')}`}
           >
-            <Plus className="h-4 w-4" />
-            <span className="sr-only">Add trade</span>
-          </Button>
-        </div>
-        
-        {tradeCount > 0 && (
-          <div className="p-2 space-y-1">
-            <div className="flex justify-between items-center">
-              <span className="text-xs">
-                {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
-              </span>
-              <span className={cn(
-                "font-semibold text-xl", // Increased font size
-                isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
-              )}>
-                {formatCurrency(totalProfit)}
-              </span>
+            <div className="flex justify-between items-start p-2">
+              <div className="relative z-10">
+                {hasNotes && (
+                  <FileText className="h-4 w-4 text-foreground opacity-70" />
+                )}
+              </div>
+              <div className="text-sm font-medium">
+                {format(date, 'd')}
+              </div>
             </div>
             
-            {/* Win rate percentage with cyan color */}
-            <div className="text-sm text-[#33C3F0] font-medium">
-              {winRate}%
+            {/* Add trade button that slides down on hover - positioned higher */}
+            <div 
+              className={cn(
+                "absolute inset-x-0 -top-8 flex justify-center transition-transform duration-300 z-20",
+                isHovered ? "translate-y-8" : "translate-y-0"
+              )}
+            >
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm rounded-full shadow-md"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectDate();
+                  setIsAddTradeOpen(true);
+                }}
+              >
+                <Plus className="h-4 w-4" />
+                <span className="sr-only">Add trade</span>
+              </Button>
             </div>
             
-            {/* Show only the most important symbol */}
-            {mostImportantSymbol && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                <div 
-                  className={cn(
-                    "text-xs px-1.5 py-0.5 rounded-full",
-                    isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
-                    isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
-                    "bg-muted text-muted-foreground"
-                  )}
-                >
-                  {mostImportantSymbol}
+            {tradeCount > 0 && (
+              <div className="p-2 space-y-0.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs">
+                    {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
+                  </span>
+                  <span className={cn(
+                    "font-semibold text-xl", 
+                    isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
+                  )}>
+                    {formatCurrency(totalProfit)}
+                  </span>
                 </div>
+                
+                {/* Win rate percentage with cyan color */}
+                <div className="text-sm text-[#33C3F0] font-medium">
+                  {winRate}%
+                </div>
+                
+                {/* Show only the most important symbol */}
+                {mostImportantSymbol && (
+                  <div className="flex flex-wrap gap-1">
+                    <div 
+                      className={cn(
+                        "text-xs px-1.5 py-0.5 rounded-full",
+                        isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
+                        isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
+                        "bg-muted text-muted-foreground"
+                      )}
+                    >
+                      {mostImportantSymbol}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-      </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-80" align="center">
+          <TradeViewPopover date={date} onAddClick={() => setIsAddTradeOpen(true)} />
+        </PopoverContent>
+      </Popover>
       
       <Dialog open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
         <DialogContent className="sm:max-w-[425px] rounded-xl shadow-xl border-2">

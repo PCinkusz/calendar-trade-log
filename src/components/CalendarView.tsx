@@ -3,13 +3,16 @@ import React from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useTradeStore } from '@/store/tradeStore';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CalendarDayCell } from './CalendarDayCell';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { TradeForm } from './TradeForm';
 
 export const CalendarView = () => {
   const [currentMonth, setCurrentMonth] = React.useState(new Date());
   const { setSelectedDate, selectedDate } = useTradeStore();
+  const [isAddTradeOpen, setIsAddTradeOpen] = React.useState(false);
   
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -67,6 +70,15 @@ export const CalendarView = () => {
             Today
           </Button>
         </div>
+        
+        <Button
+          size="lg"
+          className="bg-primary shadow-lg hover:shadow-xl transition-all rounded-xl flex gap-2 items-center px-6 py-5 text-base"
+          onClick={() => setIsAddTradeOpen(true)}
+        >
+          <Plus className="w-5 h-5" />
+          <span>Add Trade</span>
+        </Button>
       </div>
       
       <div className="grid grid-cols-7 gap-px border-b">
@@ -88,6 +100,18 @@ export const CalendarView = () => {
           />
         ))}
       </div>
+      
+      <Dialog open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-xl shadow-xl border-2">
+          <DialogHeader>
+            <DialogTitle>Add New Trade</DialogTitle>
+            <DialogDescription>
+              Enter the details of your trade below.
+            </DialogDescription>
+          </DialogHeader>
+          <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
