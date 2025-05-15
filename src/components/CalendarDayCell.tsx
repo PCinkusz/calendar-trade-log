@@ -1,13 +1,12 @@
+
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { useTradeStore } from '@/store/tradeStore';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { TradeForm } from './TradeForm';
 import { FileText, Plus } from 'lucide-react';
 import { Button } from './ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Sheet, SheetContent } from './ui/sheet';
 import { TradeViewPopover } from './TradeViewPopover';
 
 type CalendarDayCellProps = {
@@ -25,6 +24,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
 }) => {
   const { getTradesByDate } = useTradeStore();
   const [isAddTradeOpen, setIsAddTradeOpen] = useState(false);
+  const [isTradeSheetOpen, setIsTradeSheetOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   
   const dayTrades = getTradesByDate(date);
@@ -51,109 +51,111 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
   
   const mostImportantSymbol = getMostImportantSymbol();
   
+  const handleDayClick = () => {
+    onSelectDate();
+    setIsTradeSheetOpen(true);
+  };
+  
   return (
     <>
-      <Popover>
-        <PopoverTrigger asChild>
-          <div 
-            className={cn(
-              "calendar-day rounded-xl hover:shadow-md hover:scale-105 transition-all cursor-pointer relative overflow-hidden",
-              isSelected ? "ring-1 ring-primary/30" : "",
-              !isCurrentMonth ? "opacity-40" : "",
-              tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
-              tradeCount > 0 && isUnprofitableDay ? "trade-day-loss" : ""
+      <div 
+        className={cn(
+          "calendar-day rounded-xl hover:shadow-md hover:scale-[1.07] transition-all cursor-pointer relative overflow-hidden",
+          isSelected ? "ring-1 ring-primary/30" : "",
+          !isCurrentMonth ? "opacity-40" : "",
+          tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
+          tradeCount > 0 && isUnprofitableDay ? "trade-day-loss" : ""
+        )}
+        onClick={handleDayClick}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        role="button"
+        tabIndex={0}
+        aria-label={`Select ${format(date, 'MMMM d, yyyy')}`}
+      >
+        <div className="flex justify-between items-start p-2">
+          <div className="relative z-10">
+            {hasNotes && (
+              <FileText className="h-4 w-4 text-foreground opacity-70" />
             )}
-            onClick={onSelectDate}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            role="button"
-            tabIndex={0}
-            aria-label={`Select ${format(date, 'MMMM d, yyyy')}`}
+          </div>
+          <div className="text-sm font-medium">
+            {format(date, 'd')}
+          </div>
+        </div>
+        
+        <div 
+          className={cn(
+            "absolute inset-x-0 -top-10 flex justify-center transition-transform duration-300 z-20",
+            isHovered ? "translate-y-10" : "translate-y-0"
+          )}
+        >
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm rounded-full shadow-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectDate();
+              setIsAddTradeOpen(true);
+            }}
           >
-            <div className="flex justify-between items-start p-2">
-              <div className="relative z-10">
-                {hasNotes && (
-                  <FileText className="h-4 w-4 text-foreground opacity-70" />
-                )}
-              </div>
-              <div className="text-sm font-medium">
-                {format(date, 'd')}
-              </div>
-            </div>
+            <Plus className="h-4 w-4" />
+            <span className="sr-only">Add trade</span>
+          </Button>
+        </div>
+        
+        {tradeCount > 0 && (
+          <div className="p-2 space-y-1 flex flex-col">
+            <span className={cn(
+              "font-semibold text-xl", 
+              isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
+            )}>
+              {formatCurrency(totalProfit)}
+            </span>
             
-            <div 
-              className={cn(
-                "absolute inset-x-0 -top-8 flex justify-center transition-transform duration-300 z-20",
-                isHovered ? "translate-y-8" : "translate-y-0"
-              )}
-            >
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 w-6 p-0 bg-background/80 backdrop-blur-sm rounded-full shadow-md"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSelectDate();
-                  setIsAddTradeOpen(true);
-                }}
+            <span className="text-xs">
+              {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
+            </span>
+            
+            <span className="text-sm text-primary font-medium">
+              {winRate}%
+            </span>
+            
+            {mostImportantSymbol && (
+              <div 
+                className={cn(
+                  "text-xs px-1.5 py-0.5 rounded-full w-fit",
+                  isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
+                  isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
+                  "bg-muted text-muted-foreground"
+                )}
               >
-                <Plus className="h-4 w-4" />
-                <span className="sr-only">Add trade</span>
-              </Button>
-            </div>
-            
-            {tradeCount > 0 && (
-              <div className="p-2 space-y-0.5">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs">
-                    {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
-                  </span>
-                  <span className={cn(
-                    "font-semibold text-xl", 
-                    isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
-                  )}>
-                    {formatCurrency(totalProfit)}
-                  </span>
-                </div>
-                
-                <div className="text-sm text-primary font-medium">
-                  {winRate}%
-                </div>
-                
-                {mostImportantSymbol && (
-                  <div className="flex flex-wrap gap-1">
-                    <div 
-                      className={cn(
-                        "text-xs px-1.5 py-0.5 rounded-full",
-                        isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
-                        isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
-                        "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      {mostImportantSymbol}
-                    </div>
-                  </div>
-                )}
+                {mostImportantSymbol}
               </div>
             )}
           </div>
-        </PopoverTrigger>
-        <PopoverContent className="w-[500px] p-0" align="center">
-          <TradeViewPopover date={date} onAddClick={() => setIsAddTradeOpen(true)} />
-        </PopoverContent>
-      </Popover>
+        )}
+      </div>
       
-      <Dialog open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-xl shadow-xl border-2">
-          <DialogHeader>
-            <DialogTitle>Add Trade for {format(date, 'MMMM d, yyyy')}</DialogTitle>
-            <DialogDescription>
+      <Sheet open={isTradeSheetOpen} onOpenChange={setIsTradeSheetOpen}>
+        <SheetContent side="left" className="w-[500px] p-0 overflow-auto">
+          <TradeViewPopover date={date} onAddClick={() => setIsAddTradeOpen(true)} />
+        </SheetContent>
+      </Sheet>
+      
+      <Sheet open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
+        <SheetContent side="right" className="overflow-auto">
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold">Add Trade for {format(date, 'MMMM d, yyyy')}</h2>
+            <p className="text-sm text-muted-foreground">
               Enter the details of your trade below.
-            </DialogDescription>
-          </DialogHeader>
-          <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
-        </DialogContent>
-      </Dialog>
+            </p>
+            {/* We'll continue to use the TradeForm component here, just in a Sheet context */}
+            <TradeViewPopover date={date} isAddingTrade={true} onAddClick={() => {}} onSuccess={() => setIsAddTradeOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
     </>
   );
 };

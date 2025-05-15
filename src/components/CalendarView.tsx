@@ -6,7 +6,7 @@ import { useTradeStore } from '@/store/tradeStore';
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CalendarDayCell } from './CalendarDayCell';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { TradeForm } from './TradeForm';
 
 export const CalendarView = () => {
@@ -35,42 +35,9 @@ export const CalendarView = () => {
   const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
   return (
-    <div className="w-full bg-card rounded-xl shadow-md border-2">
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center space-x-2">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={prevMonth}
-            aria-label="Previous month"
-            className="rounded-lg shadow-sm hover:shadow-md transition-all"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          
-          <h2 className="text-xl font-semibold">
-            {format(currentMonth, 'MMMM yyyy')}
-          </h2>
-          
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={nextMonth}
-            aria-label="Next month"
-            className="rounded-lg shadow-sm hover:shadow-md transition-all"
-          >
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-          
-          <Button 
-            variant="outline"
-            onClick={goToToday}
-            className="ml-2 rounded-lg shadow-sm hover:shadow-md transition-all"
-          >
-            Today
-          </Button>
-        </div>
-        
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Trading Calendar</h2>
         <Button
           size="lg"
           className="bg-primary shadow-lg hover:shadow-xl transition-all rounded-xl flex gap-2 items-center px-6 py-5 text-base"
@@ -81,37 +48,75 @@ export const CalendarView = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-7 gap-px border-b">
-        {weekdays.map(day => (
-          <div key={day} className="p-2 text-center font-medium">
-            {day}
+      <div className="w-full bg-card rounded-xl shadow-md border-2">
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={prevMonth}
+              aria-label="Previous month"
+              className="rounded-lg shadow-sm hover:shadow-md transition-all"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            
+            <h2 className="text-xl font-semibold">
+              {format(currentMonth, 'MMMM yyyy')}
+            </h2>
+            
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={nextMonth}
+              aria-label="Next month"
+              className="rounded-lg shadow-sm hover:shadow-md transition-all"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+            
+            <Button 
+              variant="outline"
+              onClick={goToToday}
+              className="ml-2 rounded-lg shadow-sm hover:shadow-md transition-all"
+            >
+              Today
+            </Button>
           </div>
-        ))}
+        </div>
+        
+        <div className="grid grid-cols-7 gap-px border-b">
+          {weekdays.map(day => (
+            <div key={day} className="p-2 text-center font-medium">
+              {day}
+            </div>
+          ))}
+        </div>
+        
+        <div className="grid grid-cols-7 gap-2 p-2">
+          {monthDays.map(day => (
+            <CalendarDayCell 
+              key={day.toString()} 
+              date={day} 
+              isCurrentMonth={isSameMonth(day, currentMonth)}
+              isSelected={isSameDay(day, selectedDate)}
+              onSelectDate={() => setSelectedDate(day)}
+            />
+          ))}
+        </div>
       </div>
       
-      <div className="grid grid-cols-7 gap-2 p-2">
-        {monthDays.map(day => (
-          <CalendarDayCell 
-            key={day.toString()} 
-            date={day} 
-            isCurrentMonth={isSameMonth(day, currentMonth)}
-            isSelected={isSameDay(day, selectedDate)}
-            onSelectDate={() => setSelectedDate(day)}
-          />
-        ))}
-      </div>
-      
-      <Dialog open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
-        <DialogContent className="sm:max-w-[425px] rounded-xl shadow-xl border-2">
-          <DialogHeader>
-            <DialogTitle>Add New Trade</DialogTitle>
-            <DialogDescription>
+      <Sheet open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
+        <SheetContent className="sm:max-w-[425px] rounded-xl shadow-xl border-2 overflow-auto">
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold">Add New Trade</h2>
+            <p className="text-sm text-muted-foreground">
               Enter the details of your trade below.
-            </DialogDescription>
-          </DialogHeader>
-          <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
-        </DialogContent>
-      </Dialog>
+            </p>
+            <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
