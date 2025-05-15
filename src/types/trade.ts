@@ -8,6 +8,8 @@ export type Trade = {
   type: 'buy' | 'sell';
   entryPrice: number;
   exitPrice: number;
+  entries?: number; // Added for backward compatibility
+  exits?: number; // Added for backward compatibility
   quantity: number;
   profit: number;
   notes: string;

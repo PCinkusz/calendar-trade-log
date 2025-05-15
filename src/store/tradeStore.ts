@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,6 +8,7 @@ interface TradeState {
   trades: Trade[];
   selectedDate: Date;
   addTrade: (trade: Omit<Trade, 'id'>) => void;
+  updateTrade: (id: string, trade: Partial<Trade>) => void;
   deleteTrade: (id: string) => void;
   setSelectedDate: (date: Date) => void;
   getTradesByDate: (date: Date) => Trade[];
@@ -30,24 +30,26 @@ export const useTradeStore = create<TradeState>()(
           id: uuidv4(),
           symbol: 'AAPL',
           type: 'buy',
-          entries: 150.25,
-          exits: 158.75,
+          entryPrice: 150.25,
+          exitPrice: 158.75,
           quantity: 10,
           profit: 85,
           openDate: new Date('2025-05-14T14:30:00'),
           closeDate: new Date('2025-05-14T15:45:00'),
+          date: new Date('2025-05-14T15:45:00'),
           notes: 'Good momentum trade on earnings beat'
         },
         {
           id: uuidv4(),
           symbol: 'MSFT',
           type: 'sell',
-          entries: 325.50,
-          exits: 320.25,
+          entryPrice: 325.50,
+          exitPrice: 320.25,
           quantity: 5,
           profit: 26.25,
           openDate: new Date('2025-05-13T10:15:00'),
           closeDate: new Date('2025-05-13T11:30:00'),
+          date: new Date('2025-05-13T11:30:00'),
           notes: 'Quick scalp on market open'
         },
       ],
@@ -55,6 +57,12 @@ export const useTradeStore = create<TradeState>()(
       
       addTrade: (trade) => set(state => ({
         trades: [...state.trades, { ...trade, id: uuidv4() }]
+      })),
+      
+      updateTrade: (id, updatedTrade) => set(state => ({
+        trades: state.trades.map(trade => 
+          trade.id === id ? { ...trade, ...updatedTrade } : trade
+        )
       })),
       
       deleteTrade: (id) => set(state => ({
