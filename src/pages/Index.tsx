@@ -15,7 +15,7 @@ const Index = () => {
           <div className="lg:col-span-2 space-y-6">
             <CalendarView />
           </div>
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 relative">
             <SummarySidebar />
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { useTradeStore } from '@/store/tradeStore';
@@ -5,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import { FileText, Plus } from 'lucide-react';
 import { Button } from './ui/button';
-import { Drawer, DrawerContent, DrawerTrigger } from './ui/drawer';
+import { Dialog, DialogContent } from './ui/dialog';
 import { TradeViewPopover } from './TradeViewPopover';
 import { Sheet, SheetContent } from './ui/sheet';
 import { TradeForm } from './TradeForm';
@@ -139,26 +140,26 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         )}
       </div>
       
+      {/* Use SheetContent with left positioning to slide into the space where the summary sidebar is */}
       <Sheet 
         open={isTradeSheetOpen} 
         onOpenChange={setIsTradeSheetOpen}
       >
-        <SheetContent side="left" className="w-full md:w-[400px] p-0 overflow-auto">
+        <SheetContent 
+          side="right" 
+          className="w-full md:w-[400px] p-0 overflow-auto translate-x-[-100%] lg:translate-x-[-100%]"
+        >
           <TradeViewPopover date={date} onAddClick={() => setIsAddTradeOpen(true)} />
         </SheetContent>
       </Sheet>
       
-      <Drawer open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
-        <DrawerContent className="max-h-[95vh] overflow-y-auto">
-          <div className="p-4 space-y-4">
-            <h2 className="text-xl font-bold">Add Trade for {format(date, 'MMMM d, yyyy')}</h2>
-            <p className="text-sm text-muted-foreground">
-              Enter the details of your trade below.
-            </p>
-            <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
-          </div>
-        </DrawerContent>
-      </Drawer>
+      {/* Use Dialog instead of Drawer for a more minimal and centered add trade form */}
+      <Dialog open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
+        <DialogContent className="max-w-md mx-auto p-6">
+          <h2 className="text-xl font-bold mb-4">Add Trade for {format(date, 'MMMM d, yyyy')}</h2>
+          <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

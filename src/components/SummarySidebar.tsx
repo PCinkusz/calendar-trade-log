@@ -20,7 +20,7 @@ export const SummarySidebar = () => {
   const monthlyProfit = getMonthlyProfit(currentMonth);
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative z-10">
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-lg">Monthly Stats: {format(currentMonth, 'MMMM yyyy')}</CardTitle>

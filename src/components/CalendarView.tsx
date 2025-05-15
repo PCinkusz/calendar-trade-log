@@ -4,9 +4,8 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { Button } from '@/components/ui/button';
 import { useTradeStore } from '@/store/tradeStore';
 import { ArrowLeft, ArrowRight, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { CalendarDayCell } from './CalendarDayCell';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { TradeForm } from './TradeForm';
 
 export const CalendarView = () => {
@@ -106,17 +105,13 @@ export const CalendarView = () => {
         </div>
       </div>
       
-      <Drawer open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
-        <DrawerContent className="max-h-[95vh] overflow-y-auto">
-          <div className="p-4 space-y-4">
-            <h2 className="text-xl font-bold">Add New Trade</h2>
-            <p className="text-sm text-muted-foreground">
-              Enter the details of your trade below.
-            </p>
-            <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
-          </div>
-        </DrawerContent>
-      </Drawer>
+      {/* Replace Drawer with Dialog for a more centered, minimal approach */}
+      <Dialog open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
+        <DialogContent className="max-w-md mx-auto p-6">
+          <h2 className="text-xl font-bold mb-4">Add New Trade</h2>
+          <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -108,3 +108,11 @@
 .loss-text {
   @apply text-[hsl(var(--loss))];
 }
+
+/* Custom styles for the overlapping sheet */
+[data-side="right"].translate-x-\[-100\%\] {
+  transform: translateX(-100%) !important;
+  right: auto !important;
+  left: 0 !important;
+}
+
