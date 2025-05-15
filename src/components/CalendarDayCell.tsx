@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { useTradeStore } from '@/store/tradeStore';
@@ -9,6 +8,7 @@ import { Button } from './ui/button';
 import { Drawer, DrawerContent, DrawerTrigger } from './ui/drawer';
 import { TradeViewPopover } from './TradeViewPopover';
 import { Sheet, SheetContent } from './ui/sheet';
+import { TradeForm } from './TradeForm';
 
 type CalendarDayCellProps = {
   date: Date;
