@@ -55,7 +55,9 @@ export const useTradeStore = create<TradeState>()(
         trades: state.trades.filter(trade => trade.id !== id)
       })),
       
-      setSelectedDate: (date) => set({ selectedDate: date }),
+      setSelectedDate: (date) => set({ 
+        selectedDate: date instanceof Date ? date : new Date() 
+      }),
       
       getTradesByDate: (date) => {
         const { trades } = get();
@@ -125,6 +127,18 @@ export const useTradeStore = create<TradeState>()(
     }),
     {
       name: 'trading-journal-storage',
+      // Ensure proper serialization/deserialization of Date objects
+      serialize: (state) => JSON.stringify({
+        ...state,
+        selectedDate: state.selectedDate.toISOString()
+      }),
+      deserialize: (str) => {
+        const parsed = JSON.parse(str);
+        return {
+          ...parsed,
+          selectedDate: new Date(parsed.selectedDate)
+        };
+      }
     }
   )
 );

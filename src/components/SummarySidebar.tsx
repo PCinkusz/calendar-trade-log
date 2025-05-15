@@ -8,8 +8,13 @@ import { formatCurrency } from '@/lib/formatters';
 export const SummarySidebar = () => {
   const { getWeeklySummaries, getMonthlyProfit, selectedDate } = useTradeStore();
   
+  // Check if selectedDate is a valid Date object, if not create a new one
+  const validSelectedDate = selectedDate instanceof Date && !isNaN(selectedDate.getTime()) 
+    ? selectedDate 
+    : new Date();
+  
   // Use the current month from the selected date
-  const currentMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+  const currentMonth = new Date(validSelectedDate.getFullYear(), validSelectedDate.getMonth(), 1);
   
   const weeklySummaries = getWeeklySummaries(currentMonth);
   const monthlyProfit = getMonthlyProfit(currentMonth);
