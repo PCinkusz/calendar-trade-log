@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -7,7 +6,7 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTradeStore } from '@/store/tradeStore';
 import { Trade } from '@/types/trade';
@@ -51,10 +50,10 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
       closeDate: selectedDate,
       symbol: '',
       type: 'buy' as const,
-      entryPrice: 0,
-      exitPrice: 0,
-      quantity: 0,
-      profit: 0,
+      entryPrice: undefined as any,
+      exitPrice: undefined as any,
+      quantity: undefined as any,
+      profit: undefined as any,
       notes: '',
     },
   });
@@ -220,8 +219,11 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
             <FormItem>
               <FormLabel>Symbol</FormLabel>
               <FormControl>
-                <Input placeholder="AAPL" className="rounded-xl shadow-sm border-2" {...field} />
+                <Input placeholder="" className="rounded-xl shadow-sm border-2" {...field} />
               </FormControl>
+              <FormDescription className="text-xs">
+                Enter ticker symbol (e.g., AAPL)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -256,18 +258,23 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           <FormField
             control={form.control}
             name="entryPrice"
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field }}) => (
               <FormItem>
                 <FormLabel>Entry Price</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
                     step="0.01" 
-                    placeholder="0.00" 
+                    placeholder=""
                     className="rounded-xl shadow-sm border-2" 
+                    value={value === undefined ? "" : value}
+                    onChange={onChange}
                     {...field} 
                   />
                 </FormControl>
+                <FormDescription className="text-xs">
+                  Enter the price at entry (e.g., 150.00)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -276,18 +283,23 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           <FormField
             control={form.control}
             name="exitPrice"
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field }}) => (
               <FormItem>
                 <FormLabel>Exit Price</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
                     step="0.01" 
-                    placeholder="0.00"
+                    placeholder=""
                     className="rounded-xl shadow-sm border-2" 
+                    value={value === undefined ? "" : value}
+                    onChange={onChange}
                     {...field} 
                   />
                 </FormControl>
+                <FormDescription className="text-xs">
+                  Enter the price at exit (e.g., 155.00)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -298,17 +310,22 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           <FormField
             control={form.control}
             name="quantity"
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field }}) => (
               <FormItem>
                 <FormLabel>Volume</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
-                    placeholder="0"
+                    placeholder=""
                     className="rounded-xl shadow-sm border-2" 
+                    value={value === undefined ? "" : value}
+                    onChange={onChange}
                     {...field} 
                   />
                 </FormControl>
+                <FormDescription className="text-xs">
+                  Enter number of shares/contracts
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -317,22 +334,27 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
           <FormField
             control={form.control}
             name="profit"
-            render={({ field }) => (
+            render={({ field: { value, onChange, ...field }}) => (
               <FormItem>
                 <FormLabel>Profit/Loss</FormLabel>
                 <FormControl>
                   <Input 
                     type="number" 
                     step="0.01" 
-                    placeholder="0.00"
+                    placeholder=""
                     className={cn(
                       "rounded-xl shadow-sm border-2",
-                      parseFloat(field.value as any) > 0 ? "text-[hsl(var(--profit))]" : 
-                      parseFloat(field.value as any) < 0 ? "text-[hsl(var(--loss))]" : ""
+                      parseFloat(value as any) > 0 ? "text-[hsl(var(--profit))]" : 
+                      parseFloat(value as any) < 0 ? "text-[hsl(var(--loss))]" : ""
                     )}
+                    value={value === undefined ? "" : value}
+                    onChange={onChange}
                     {...field} 
                   />
                 </FormControl>
+                <FormDescription className="text-xs">
+                  Enter total profit/loss (negative for loss)
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -347,11 +369,14 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
               <FormLabel>Notes</FormLabel>
               <FormControl>
                 <Textarea 
-                  placeholder="Add your trade notes here..." 
+                  placeholder="" 
                   className="resize-none rounded-xl shadow-sm border-2" 
                   {...field} 
                 />
               </FormControl>
+              <FormDescription className="text-xs">
+                Optional trade notes or observations
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

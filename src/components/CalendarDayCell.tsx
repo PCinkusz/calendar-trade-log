@@ -6,8 +6,9 @@ import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/formatters';
 import { FileText, Plus } from 'lucide-react';
 import { Button } from './ui/button';
-import { Sheet, SheetContent } from './ui/sheet';
+import { Drawer, DrawerContent, DrawerTrigger } from './ui/drawer';
 import { TradeViewPopover } from './TradeViewPopover';
+import { Sheet, SheetContent } from './ui/sheet';
 
 type CalendarDayCellProps = {
   date: Date;
@@ -60,7 +61,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
     <>
       <div 
         className={cn(
-          "calendar-day rounded-xl hover:shadow-md hover:scale-[1.07] transition-all cursor-pointer relative overflow-hidden",
+          "calendar-day rounded-xl hover:shadow-md hover:scale-[1.1] transition-all cursor-pointer relative overflow-hidden",
           isSelected ? "ring-1 ring-primary/30" : "",
           !isCurrentMonth ? "opacity-40" : "",
           tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
@@ -86,8 +87,8 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         
         <div 
           className={cn(
-            "absolute inset-x-0 -top-10 flex justify-center transition-transform duration-300 z-20",
-            isHovered ? "translate-y-10" : "translate-y-0"
+            "absolute inset-x-0 -top-14 flex justify-center transition-transform duration-300 z-20",
+            isHovered ? "translate-y-14" : "translate-y-0"
           )}
         >
           <Button 
@@ -106,19 +107,19 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         </div>
         
         {tradeCount > 0 && (
-          <div className="p-2 space-y-1 flex flex-col">
+          <div className="p-2 space-y-0.5 flex flex-col">
             <span className={cn(
-              "font-semibold text-xl", 
+              "font-semibold text-2xl", 
               isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
             )}>
               {formatCurrency(totalProfit)}
             </span>
             
-            <span className="text-xs">
+            <span className="text-xs text-muted-foreground">
               {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
             </span>
             
-            <span className="text-sm text-primary font-medium">
+            <span className="text-sm text-[hsl(var(--primary))]">
               {winRate}%
             </span>
             
@@ -138,24 +139,26 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         )}
       </div>
       
-      <Sheet open={isTradeSheetOpen} onOpenChange={setIsTradeSheetOpen}>
-        <SheetContent side="left" className="w-[500px] p-0 overflow-auto">
+      <Sheet 
+        open={isTradeSheetOpen} 
+        onOpenChange={setIsTradeSheetOpen}
+      >
+        <SheetContent side="left" className="w-full md:w-[400px] p-0 overflow-auto">
           <TradeViewPopover date={date} onAddClick={() => setIsAddTradeOpen(true)} />
         </SheetContent>
       </Sheet>
       
-      <Sheet open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
-        <SheetContent side="right" className="overflow-auto">
-          <div className="space-y-4">
+      <Drawer open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
+        <DrawerContent className="max-h-[95vh] overflow-y-auto">
+          <div className="p-4 space-y-4">
             <h2 className="text-xl font-bold">Add Trade for {format(date, 'MMMM d, yyyy')}</h2>
             <p className="text-sm text-muted-foreground">
               Enter the details of your trade below.
             </p>
-            {/* We'll continue to use the TradeForm component here, just in a Sheet context */}
-            <TradeViewPopover date={date} isAddingTrade={true} onAddClick={() => {}} onSuccess={() => setIsAddTradeOpen(false)} />
+            <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
           </div>
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };
