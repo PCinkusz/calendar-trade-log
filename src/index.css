@@ -38,9 +38,9 @@
     /* Trading specific colors - stronger tones */
     --profit: 142 85% 36%;
     --profit-background: 142 85% 95%;
-    --loss: 0 100% 55%;
-    --loss-background: 0 100% 95%;
-    --loss-background-intense: 0 100% 90%;
+    --loss: 0 100% 50%;
+    --loss-background: 0 100% 90%;
+    --loss-background-intense: 0 100% 85%;
   }
 
   .dark {
@@ -75,9 +75,9 @@
     /* Trading specific dark colors - stronger tones */
     --profit: 142 80% 45%;
     --profit-background: 142 80% 15%;
-    --loss: 0 100% 65%;
+    --loss: 0 100% 60%;
     --loss-background: 0 100% 15%;
-    --loss-background-intense: 0 100% 25%;
+    --loss-background-intense: 0 100% 20%;
   }
 }
 
@@ -117,4 +117,3 @@
   right: auto !important;
   left: 0 !important;
 }
-

@@ -33,11 +33,14 @@ const TradeFormSchema = z.object({
 
 type TradeFormProps = {
   onSuccess: () => void;
-  editingTrade?: Trade;
+  tradeId?: string;
 };
 
-export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade }) => {
-  const { addTrade, updateTrade, selectedDate } = useTradeStore();
+export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, tradeId }) => {
+  const { addTrade, updateTrade, selectedDate, getTrade } = useTradeStore();
+  
+  // Get the trade if we have a tradeId
+  const editingTrade = tradeId ? getTrade(tradeId) : undefined;
   
   const form = useForm<z.infer<typeof TradeFormSchema>>({
     resolver: zodResolver(TradeFormSchema),
@@ -59,8 +62,8 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
   });
   
   const onSubmit = (data: z.infer<typeof TradeFormSchema>) => {
-    if (editingTrade) {
-      updateTrade(editingTrade.id, data);
+    if (tradeId && editingTrade) {
+      updateTrade(tradeId, data);
     } else {
       // We use closeDate as the primary date for the trade 
       addTrade({
@@ -383,7 +386,7 @@ export const TradeForm: React.FC<TradeFormProps> = ({ onSuccess, editingTrade })
         />
         
         <Button type="submit" className="w-full rounded-xl shadow-md hover:shadow-lg transition-all">
-          {editingTrade ? 'Update Trade' : 'Add Trade'}
+          {tradeId ? 'Update Trade' : 'Add Trade'}
         </Button>
       </form>
     </Form>
