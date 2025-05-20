@@ -13,7 +13,7 @@ import { Plus } from 'lucide-react';
 
 export const TradeList = () => {
   const { selectedDate, getTradesByDate, deleteTrade } = useTradeStore();
-  const [editingTrade, setEditingTrade] = useState<Trade | undefined>(undefined);
+  const [editingTradeId, setEditingTradeId] = useState<string | undefined>(undefined);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
@@ -23,13 +23,13 @@ export const TradeList = () => {
   const winRate = trades.length > 0 ? Math.round((winningTrades / trades.length) * 100) : 0;
   
   const handleEditTrade = (trade: Trade) => {
-    setEditingTrade(trade);
+    setEditingTradeId(trade.id);
     setIsEditDialogOpen(true);
   };
   
   const closeEditDialog = () => {
     setIsEditDialogOpen(false);
-    setEditingTrade(undefined);
+    setEditingTradeId(undefined);
   };
   
   return (
@@ -167,9 +167,9 @@ export const TradeList = () => {
               Update the details of your trade.
             </DialogDescription>
           </DialogHeader>
-          {editingTrade && (
+          {editingTradeId && (
             <TradeForm
-              editingTrade={editingTrade}
+              tradeId={editingTradeId}
               onSuccess={closeEditDialog}
             />
           )}

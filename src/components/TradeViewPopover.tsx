@@ -22,7 +22,7 @@ export const TradeViewPopover: React.FC<TradeViewPopoverProps> = ({
   onSuccess,
   onEditClick
 }) => {
-  const { getTradesByDate, deleteTrade, getTrade } = useTradeStore();
+  const { getTradesByDate, deleteTrade } = useTradeStore();
   const trades = getTradesByDate(date);
   
   if (isAddingTrade) {

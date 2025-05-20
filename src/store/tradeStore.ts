@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +13,7 @@ interface TradeState {
   deleteTrade: (id: string) => void;
   setSelectedDate: (date: Date) => void;
   getTradesByDate: (date: Date) => Trade[];
+  getTrade: (id: string) => Trade | undefined;
   getWeeklySummaries: (monthDate: Date) => Array<{
     weekNumber: number;
     startDate: Date;
@@ -79,6 +81,11 @@ export const useTradeStore = create<TradeState>()(
           const closeDate = new Date(trade.closeDate);
           return isSameDay(closeDate, date);
         });
+      },
+      
+      getTrade: (id) => {
+        const { trades } = get();
+        return trades.find(trade => trade.id === id);
       },
       
       getWeeklySummaries: (monthDate) => {
