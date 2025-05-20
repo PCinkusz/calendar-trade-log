@@ -8,7 +8,7 @@ import { FileText, Plus } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent } from './ui/dialog';
 import { TradeViewPopover } from './TradeViewPopover';
-import { Sheet, SheetContent } from './ui/sheet';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { TradeForm } from './TradeForm';
 
 type CalendarDayCellProps = {
@@ -26,7 +26,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
 }) => {
   const { getTradesByDate } = useTradeStore();
   const [isAddTradeOpen, setIsAddTradeOpen] = useState(false);
-  const [isTradeSheetOpen, setIsTradeSheetOpen] = useState(false);
+  const [isTradePopoverOpen, setIsTradePopoverOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   
   const dayTrades = getTradesByDate(date);
@@ -55,7 +55,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
   
   const handleDayClick = () => {
     onSelectDate();
-    setIsTradeSheetOpen(true);
+    setIsTradePopoverOpen(true);
   };
   
   return (
@@ -66,7 +66,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
           isSelected ? "ring-1 ring-primary/30" : "",
           !isCurrentMonth ? "opacity-40" : "",
           tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
-          tradeCount > 0 && isUnprofitableDay ? "trade-day-loss" : ""
+          tradeCount > 0 && isUnprofitableDay ? "trade-day-loss bg-[hsl(var(--loss-background-intense))]" : ""
         )}
         onClick={handleDayClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -75,13 +75,13 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         tabIndex={0}
         aria-label={`Select ${format(date, 'MMMM d, yyyy')}`}
       >
-        <div className="flex justify-between items-start p-2">
-          <div className="relative z-10">
+        <div className="flex justify-between items-start">
+          <div className="relative z-10 p-2">
             {hasNotes && (
               <FileText className="h-4 w-4 text-foreground opacity-70" />
             )}
           </div>
-          <div className="text-sm font-medium">
+          <div className="text-sm font-medium p-2">
             {format(date, 'd')}
           </div>
         </div>
@@ -108,7 +108,7 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         </div>
         
         {tradeCount > 0 && (
-          <div className="p-2 space-y-0.5 flex flex-col">
+          <div className="p-1 px-2 flex flex-col items-end space-y-0.5">
             <span className={cn(
               "font-semibold text-2xl", 
               isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
@@ -116,44 +116,48 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
               {formatCurrency(totalProfit)}
             </span>
             
-            <span className="text-xs text-muted-foreground">
-              {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
-            </span>
-            
-            <span className="text-sm text-[hsl(var(--primary))]">
-              {winRate}%
-            </span>
-            
-            {mostImportantSymbol && (
-              <div 
-                className={cn(
-                  "text-xs px-1.5 py-0.5 rounded-full w-fit",
-                  isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
-                  isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
-                  "bg-muted text-muted-foreground"
-                )}
-              >
-                {mostImportantSymbol}
-              </div>
-            )}
+            <div className="flex flex-col items-end space-y-0.5">
+              <span className="text-xs text-muted-foreground">
+                {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
+              </span>
+              
+              <span className="text-xs text-[hsl(var(--primary))]">
+                WR: {winRate}%
+              </span>
+              
+              {mostImportantSymbol && (
+                <div 
+                  className={cn(
+                    "text-xs px-1.5 py-0.5 rounded-full w-fit",
+                    isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
+                    isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
+                    "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {mostImportantSymbol}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
       
-      {/* Use SheetContent with left positioning to slide into the space where the summary sidebar is */}
-      <Sheet 
-        open={isTradeSheetOpen} 
-        onOpenChange={setIsTradeSheetOpen}
-      >
-        <SheetContent 
-          side="right" 
-          className="w-full md:w-[400px] p-0 overflow-auto translate-x-[-100%] lg:translate-x-[-100%]"
+      {/* Popover instead of Sheet for the trade view */}
+      <Popover open={isTradePopoverOpen} onOpenChange={setIsTradePopoverOpen}>
+        <PopoverTrigger className="hidden" />
+        <PopoverContent 
+          className="w-[350px] max-h-[500px] overflow-auto p-0 shadow-lg relative"
+          side="bottom"
+          align="start"
+          sideOffset={5}
         >
-          <TradeViewPopover date={date} onAddClick={() => setIsAddTradeOpen(true)} />
-        </SheetContent>
-      </Sheet>
+          <TradeViewPopover 
+            date={date} 
+            onAddClick={() => setIsAddTradeOpen(true)} 
+          />
+        </PopoverContent>
+      </Popover>
       
-      {/* Use Dialog instead of Drawer for a more minimal and centered add trade form */}
       <Dialog open={isAddTradeOpen} onOpenChange={setIsAddTradeOpen}>
         <DialogContent className="max-w-md mx-auto p-6">
           <h2 className="text-xl font-bold mb-4">Add Trade for {format(date, 'MMMM d, yyyy')}</h2>

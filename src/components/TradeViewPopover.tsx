@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { useTradeStore } from '@/store/tradeStore';
 import { Button } from '@/components/ui/button';
 import { TradeForm } from '@/components/TradeForm';
+import { formatCurrency } from '@/lib/formatters';
 
 interface TradeViewPopoverProps {
   date: Date;
@@ -26,8 +27,8 @@ export const TradeViewPopover: React.FC<TradeViewPopoverProps> = ({
   }
   
   return (
-    <div className="p-4 max-h-[80vh] overflow-auto">
-      <div className="flex justify-between items-center mb-4">
+    <div className="p-4 max-h-[400px] overflow-auto">
+      <div className="flex justify-between items-center mb-4 sticky top-0 bg-popover z-10 pb-2">
         <h3 className="text-lg font-semibold">{format(date, 'MMMM d, yyyy')}</h3>
         <Button 
           variant="outline"
@@ -39,7 +40,7 @@ export const TradeViewPopover: React.FC<TradeViewPopoverProps> = ({
       </div>
       
       {trades.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {trades.map((trade) => (
             <div 
               key={trade.id} 
@@ -53,7 +54,7 @@ export const TradeViewPopover: React.FC<TradeViewPopoverProps> = ({
                   </p>
                 </div>
                 <span className={`font-semibold ${trade.profit > 0 ? 'profit-text' : 'loss-text'}`}>
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(trade.profit)}
+                  {formatCurrency(trade.profit)}
                 </span>
               </div>
               {trade.notes && <p className="mt-2 text-sm border-t pt-2">{trade.notes}</p>}

@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 210 30% 97%;
+    --background: 195 30% 97%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -40,6 +40,7 @@
     --profit-background: 142 76% 95%;
     --loss: 0 84% 60%;
     --loss-background: 0 84% 95%;
+    --loss-background-intense: 0 85% 90%;
   }
 
   .dark {
@@ -76,6 +77,7 @@
     --profit-background: 142 70% 15%;
     --loss: 0 84% 65%;
     --loss-background: 0 84% 15%;
+    --loss-background-intense: 0 85% 25%;
   }
 }
 
@@ -115,4 +117,3 @@
   right: auto !important;
   left: 0 !important;
 }
-
