@@ -35,12 +35,12 @@
 
     --radius: 0.75rem;
 
-    /* Trading specific colors */
-    --profit: 142 76% 36%;
-    --profit-background: 142 76% 95%;
-    --loss: 0 84% 60%;
-    --loss-background: 0 84% 95%;
-    --loss-background-intense: 0 85% 90%;
+    /* Trading specific colors - stronger tones */
+    --profit: 142 85% 36%;
+    --profit-background: 142 85% 95%;
+    --loss: 0 100% 55%;
+    --loss-background: 0 100% 95%;
+    --loss-background-intense: 0 100% 90%;
   }
 
   .dark {
@@ -72,12 +72,12 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 187 75% 50%;
 
-    /* Trading specific dark colors */
-    --profit: 142 76% 45%;
-    --profit-background: 142 70% 15%;
-    --loss: 0 84% 65%;
-    --loss-background: 0 84% 15%;
-    --loss-background-intense: 0 85% 25%;
+    /* Trading specific dark colors - stronger tones */
+    --profit: 142 80% 45%;
+    --profit-background: 142 80% 15%;
+    --loss: 0 100% 65%;
+    --loss-background: 0 100% 15%;
+    --loss-background-intense: 0 100% 25%;
   }
 }
 
@@ -100,7 +100,7 @@
 }
 
 .trade-day-loss {
-  @apply bg-[hsl(var(--loss-background))];
+  @apply bg-[hsl(var(--loss-background-intense))];
 }
 
 .profit-text {
@@ -117,3 +117,4 @@
   right: auto !important;
   left: 0 !important;
 }
+

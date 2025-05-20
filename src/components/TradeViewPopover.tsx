@@ -5,21 +5,24 @@ import { useTradeStore } from '@/store/tradeStore';
 import { Button } from '@/components/ui/button';
 import { TradeForm } from '@/components/TradeForm';
 import { formatCurrency } from '@/lib/formatters';
+import { Edit, Trash2 } from 'lucide-react';
 
 interface TradeViewPopoverProps {
   date: Date;
   onAddClick: () => void;
   isAddingTrade?: boolean;
   onSuccess?: () => void;
+  onEditClick?: (tradeId: string) => void;
 }
 
 export const TradeViewPopover: React.FC<TradeViewPopoverProps> = ({ 
   date,
   onAddClick,
   isAddingTrade = false,
-  onSuccess
+  onSuccess,
+  onEditClick
 }) => {
-  const { getTradesByDate } = useTradeStore();
+  const { getTradesByDate, deleteTrade } = useTradeStore();
   const trades = getTradesByDate(date);
   
   if (isAddingTrade) {
@@ -52,10 +55,36 @@ export const TradeViewPopover: React.FC<TradeViewPopoverProps> = ({
                   <p className="text-sm text-muted-foreground">
                     {trade.type === 'buy' ? 'Long' : 'Short'} • {format(new Date(trade.closeDate), 'h:mm a')}
                   </p>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    <p>Open: {format(new Date(trade.openDate), 'h:mm a')} • {formatCurrency(trade.entryPrice)}</p>
+                    <p>Close: {format(new Date(trade.closeDate), 'h:mm a')} • {formatCurrency(trade.exitPrice)}</p>
+                  </div>
                 </div>
-                <span className={`font-semibold ${trade.profit > 0 ? 'profit-text' : 'loss-text'}`}>
-                  {formatCurrency(trade.profit)}
-                </span>
+                <div className="flex flex-col items-end">
+                  <span className={`font-semibold ${trade.profit > 0 ? 'profit-text' : 'loss-text'}`}>
+                    {formatCurrency(trade.profit)}
+                  </span>
+                  <div className="flex space-x-1 mt-1">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7" 
+                      onClick={() => onEditClick && onEditClick(trade.id)}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit trade</span>
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-7 w-7" 
+                      onClick={() => deleteTrade(trade.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete trade</span>
+                    </Button>
+                  </div>
+                </div>
               </div>
               {trade.notes && <p className="mt-2 text-sm border-t pt-2">{trade.notes}</p>}
             </div>

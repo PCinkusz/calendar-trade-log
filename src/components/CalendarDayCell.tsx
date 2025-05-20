@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { useTradeStore } from '@/store/tradeStore';
 import { cn } from '@/lib/utils';
@@ -26,8 +26,11 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
 }) => {
   const { getTradesByDate } = useTradeStore();
   const [isAddTradeOpen, setIsAddTradeOpen] = useState(false);
+  const [isEditTradeOpen, setIsEditTradeOpen] = useState(false);
+  const [editTradeId, setEditTradeId] = useState<string | null>(null);
   const [isTradePopoverOpen, setIsTradePopoverOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const cellRef = useRef<HTMLDivElement>(null);
   
   const dayTrades = getTradesByDate(date);
   
@@ -57,16 +60,23 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
     onSelectDate();
     setIsTradePopoverOpen(true);
   };
+
+  const handleEditClick = (tradeId: string) => {
+    setEditTradeId(tradeId);
+    setIsEditTradeOpen(true);
+    setIsTradePopoverOpen(false);
+  };
   
   return (
     <>
       <div 
+        ref={cellRef}
         className={cn(
-          "calendar-day rounded-xl hover:shadow-md hover:scale-[1.1] transition-all cursor-pointer relative overflow-hidden",
+          "calendar-day rounded-xl hover:shadow-md transition-all cursor-pointer relative overflow-hidden",
           isSelected ? "ring-1 ring-primary/30" : "",
           !isCurrentMonth ? "opacity-40" : "",
           tradeCount > 0 && isProfitableDay ? "trade-day-profit" : "",
-          tradeCount > 0 && isUnprofitableDay ? "trade-day-loss bg-[hsl(var(--loss-background-intense))]" : ""
+          tradeCount > 0 && isUnprofitableDay ? "trade-day-loss" : ""
         )}
         onClick={handleDayClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -108,27 +118,25 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         </div>
         
         {tradeCount > 0 && (
-          <div className="p-1 px-2 flex flex-col items-end space-y-0.5">
+          <div className="p-1 px-2 flex flex-col items-end">
             <span className={cn(
-              "font-semibold text-2xl", 
+              "font-semibold text-xl", 
               isProfitableDay ? "profit-text" : isUnprofitableDay ? "loss-text" : ""
             )}>
-              {formatCurrency(totalProfit)}
+              {formatCurrency(totalProfit).replace(/\s/g, '')}
             </span>
             
-            <div className="flex flex-col items-end space-y-0.5">
-              <span className="text-xs text-muted-foreground">
+            <div className="flex flex-col items-end text-xs">
+              <span className="text-muted-foreground">
                 {tradeCount} {tradeCount === 1 ? 'trade' : 'trades'}
               </span>
-              
-              <span className="text-xs text-[hsl(var(--primary))]">
+              <span className="text-[hsl(var(--primary))]">
                 WR: {winRate}%
               </span>
-              
               {mostImportantSymbol && (
                 <div 
                   className={cn(
-                    "text-xs px-1.5 py-0.5 rounded-full w-fit",
+                    "px-1 py-0.5 rounded-full w-fit",
                     isProfitableDay ? "bg-[hsl(var(--profit-background))] text-[hsl(var(--profit))]" : 
                     isUnprofitableDay ? "bg-[hsl(var(--loss-background))] text-[hsl(var(--loss))]" : 
                     "bg-muted text-muted-foreground"
@@ -142,18 +150,20 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         )}
       </div>
       
-      {/* Popover instead of Sheet for the trade view */}
       <Popover open={isTradePopoverOpen} onOpenChange={setIsTradePopoverOpen}>
         <PopoverTrigger className="hidden" />
         <PopoverContent 
-          className="w-[350px] max-h-[500px] overflow-auto p-0 shadow-lg relative"
+          className="w-[350px] max-h-[500px] overflow-auto p-0 shadow-lg"
           side="bottom"
           align="start"
+          alignOffset={-15}
           sideOffset={5}
+          avoidCollisions={true}
         >
           <TradeViewPopover 
             date={date} 
-            onAddClick={() => setIsAddTradeOpen(true)} 
+            onAddClick={() => setIsAddTradeOpen(true)}
+            onEditClick={handleEditClick}
           />
         </PopoverContent>
       </Popover>
@@ -162,6 +172,19 @@ export const CalendarDayCell: React.FC<CalendarDayCellProps> = ({
         <DialogContent className="max-w-md mx-auto p-6">
           <h2 className="text-xl font-bold mb-4">Add Trade for {format(date, 'MMMM d, yyyy')}</h2>
           <TradeForm onSuccess={() => setIsAddTradeOpen(false)} />
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isEditTradeOpen} onOpenChange={setIsEditTradeOpen}>
+        <DialogContent className="max-w-md mx-auto p-6">
+          <h2 className="text-xl font-bold mb-4">Edit Trade</h2>
+          <TradeForm 
+            tradeId={editTradeId || undefined} 
+            onSuccess={() => {
+              setIsEditTradeOpen(false);
+              setEditTradeId(null);
+            }} 
+          />
         </DialogContent>
       </Dialog>
     </>
